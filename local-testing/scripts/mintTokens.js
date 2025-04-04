@@ -1,4 +1,6 @@
 const hre = require("hardhat");
+const { ethers } = require("hardhat");
+const fs = require('fs');
 
 async function main() {
   try {
@@ -7,25 +9,24 @@ async function main() {
     const signerAddress = await signer.getAddress();
     console.log("Using signer address:", signerAddress);
 
-    // Get contract instances
-    const token1Address = "0x74Ce26A2e4c1368C48A0157CE762944d282896Db";
-    const token2Address = "0x7c77704007C9996Ee591C516f7319828BA49d91E";
-    const factoryAddress = "0x676F5F71DAE1C83Dc31775E4c61212bC9e799d9C";
+    // Read deployed addresses
+    const addresses = JSON.parse(fs.readFileSync('deployed-addresses.json', 'utf8'));
+    const { token1, token2 } = addresses;
 
     console.log("Connecting to tokens...");
-    const Token1 = await hre.ethers.getContractAt("TestToken", token1Address);
-    const Token2 = await hre.ethers.getContractAt("TestToken", token2Address);
+    const Token1 = await hre.ethers.getContractAt("TestToken", token1);
+    const Token2 = await hre.ethers.getContractAt("TestToken", token2);
 
     // Amount to mint (in wei)
-    const amount = hre.ethers.parseEther("10000"); // 10,000 tokens each
+    const amount = ethers.utils.parseEther("10000"); // 10,000 tokens each
 
     // Check current balances
     console.log("Current balances:");
     const balance1 = await Token1.balanceOf(signerAddress);
     const balance2 = await Token2.balanceOf(signerAddress);
     console.log({
-      token1: hre.ethers.formatEther(balance1),
-      token2: hre.ethers.formatEther(balance2)
+      token1: ethers.utils.formatEther(balance1),
+      token2: ethers.utils.formatEther(balance2)
     });
 
     // Mint tokens
@@ -43,8 +44,8 @@ async function main() {
     const newBalance1 = await Token1.balanceOf(signerAddress);
     const newBalance2 = await Token2.balanceOf(signerAddress);
     console.log({
-      token1: hre.ethers.formatEther(newBalance1),
-      token2: hre.ethers.formatEther(newBalance2)
+      token1: ethers.utils.formatEther(newBalance1),
+      token2: ethers.utils.formatEther(newBalance2)
     });
 
   } catch (error) {
@@ -58,4 +59,4 @@ main()
   .catch((error) => {
     console.error(error);
     process.exit(1);
-  }); 
+  });
