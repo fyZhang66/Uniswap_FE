@@ -30,9 +30,9 @@ async function main() {
   try {
     console.log('Starting liquidity addition...');
 
-    // Amounts to add (in wei)
-    const amount1 = parseEther('1000');
-    const amount2 = parseEther('1000');
+    // Amount of liquidity to add (smaller amounts)
+    const amount1 = parseEther('100'); // 100 tokens
+    const amount2 = parseEther('100'); // 100 tokens
 
     // Check initial balances
     const initialBalance1 = await publicClient.readContract({
@@ -52,47 +52,55 @@ async function main() {
       token2: formatEther(initialBalance2),
     });
 
-    // Check initial reserves
-    const initialReserves = await publicClient.readContract({
-      address: pair,
-      abi: UniswapV2PairABI,
-      functionName: 'getReserves',
-    });
-    console.log('Initial reserves:', {
-      reserve0: formatEther(initialReserves[0]),
-      reserve1: formatEther(initialReserves[1]),
-    });
-
     // Approve tokens
-    console.log('Approving Token1...');
-    const approveToken1Tx = await walletClient.writeContract({
+    console.log('Approving tokens...');
+    const approveTx1 = await walletClient.writeContract({
       address: token1,
       abi: TestTokenABI,
       functionName: 'approve',
       args: [pair, amount1],
     });
-    await publicClient.waitForTransactionReceipt({ hash: approveToken1Tx });
+    await publicClient.waitForTransactionReceipt({ hash: approveTx1 });
     console.log('Token1 approved');
 
-    console.log('Approving Token2...');
-    const approveToken2Tx = await walletClient.writeContract({
+    const approveTx2 = await walletClient.writeContract({
       address: token2,
       abi: TestTokenABI,
       functionName: 'approve',
       args: [pair, amount2],
     });
-    await publicClient.waitForTransactionReceipt({ hash: approveToken2Tx });
+    await publicClient.waitForTransactionReceipt({ hash: approveTx2 });
     console.log('Token2 approved');
+
+    // Transfer tokens to pair
+    console.log('Transferring tokens to pair...');
+    const transferTx1 = await walletClient.writeContract({
+      address: token1,
+      abi: TestTokenABI,
+      functionName: 'transfer',
+      args: [pair, amount1],
+    });
+    await publicClient.waitForTransactionReceipt({ hash: transferTx1 });
+    console.log('Token1 transferred');
+
+    const transferTx2 = await walletClient.writeContract({
+      address: token2,
+      abi: TestTokenABI,
+      functionName: 'transfer',
+      args: [pair, amount2],
+    });
+    await publicClient.waitForTransactionReceipt({ hash: transferTx2 });
+    console.log('Token2 transferred');
 
     // Add liquidity
     console.log('Adding liquidity...');
-    const addLiquidityTx = await walletClient.writeContract({
+    const mintTx = await walletClient.writeContract({
       address: pair,
       abi: UniswapV2PairABI,
       functionName: 'mint',
       args: [account.address],
     });
-    await publicClient.waitForTransactionReceipt({ hash: addLiquidityTx });
+    await publicClient.waitForTransactionReceipt({ hash: mintTx });
     console.log('Liquidity added successfully');
 
     // Check final balances
@@ -113,30 +121,19 @@ async function main() {
       token2: formatEther(finalBalance2),
     });
 
-    // Check final reserves
-    const finalReserves = await publicClient.readContract({
+    // Check reserves
+    const reserves = await publicClient.readContract({
       address: pair,
       abi: UniswapV2PairABI,
       functionName: 'getReserves',
     });
-    console.log('Final reserves:', {
-      reserve0: formatEther(finalReserves[0]),
-      reserve1: formatEther(finalReserves[1]),
+    console.log('Pool reserves:', {
+      reserve0: formatEther(reserves[0]),
+      reserve1: formatEther(reserves[1]),
     });
-
-    // Check LP token balance
-    const lpBalance = await publicClient.readContract({
-      address: pair,
-      abi: UniswapV2PairABI,
-      functionName: 'balanceOf',
-      args: [account.address],
-    });
-    console.log('LP tokens received:', formatEther(lpBalance));
-
-    console.log('Liquidity addition completed successfully!');
 
   } catch (error) {
-    console.error('Error during liquidity addition:', error);
+    console.error('Error:', error);
     process.exit(1);
   }
 }

@@ -6,7 +6,7 @@ const fs = require('fs');
 
 // Read deployed addresses
 const addresses = JSON.parse(fs.readFileSync('deployed-addresses.json', 'utf8'));
-const { token1, token2, factory, pair } = addresses;
+const { token1, token2, factory, pair, router } = addresses;
 
 // Create clients
 const publicClient = createPublicClient({
@@ -25,14 +25,16 @@ const walletClient = createWalletClient({
 // Contract ABIs
 const TestTokenABI = require('../artifacts/contracts/ERC20.sol/TestToken.json').abi;
 const UniswapV2PairABI = require('../artifacts/contracts/UniswapV2Pair.sol/UniswapV2Pair.json').abi;
+const UniswapV2RouterABI = require('../artifacts/contracts/UniswapV2Router.sol/UniswapV2Router.json').abi;
 
 async function main() {
   try {
-    console.log('Starting swap...');
+    console.log('Starting router swap...');
 
-    // Amounts for swap
-    const amountIn = parseEther('10');
-    const minAmountOut = parseEther('9.9'); // 1% slippage
+    // Amount to swap
+    const amountIn = parseEther('10'); // 10 tokens
+    const amountOutMin = parseEther('9'); // 9.5 tokens (5% slippage)
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 20); // 20 minutes from now
 
     // Check initial balances
     const initialBalance1 = await publicClient.readContract({
@@ -63,38 +65,43 @@ async function main() {
       reserve1: formatEther(initialReserves[1]),
     });
 
-    // Approve token for swap
-    console.log('Approving Token1 for swap...');
+    // Get expected output amount
+    const path = [token1, token2];
+    const amountsOut = await publicClient.readContract({
+      address: router,
+      abi: UniswapV2RouterABI,
+      functionName: 'getAmountsOut',
+      args: [amountIn, path],
+    });
+    console.log('Expected output amount:', formatEther(amountsOut[1]));
+
+    // Approve token1 for router
+    console.log('Approving token1 for router...');
     const approveTx = await walletClient.writeContract({
       address: token1,
       abi: TestTokenABI,
       functionName: 'approve',
-      args: [pair, amountIn],
+      args: [router, amountIn],
     });
     await publicClient.waitForTransactionReceipt({ hash: approveTx });
-    console.log('Token1 approved for swap');
+    console.log('Token1 approved for router');
 
-    // Transfer tokens to pair
-    console.log('Transferring Token1 to pair...');
-    const transferTx = await walletClient.writeContract({
-      address: token1,
-      abi: TestTokenABI,
-      functionName: 'transfer',
-      args: [pair, amountIn],
-    });
-    await publicClient.waitForTransactionReceipt({ hash: transferTx });
-    console.log('Token1 transferred to pair');
-
-    // Perform swap
-    console.log('Performing swap...');
+    // Execute swap
+    console.log('Executing swap...');
     const swapTx = await walletClient.writeContract({
-      address: pair,
-      abi: UniswapV2PairABI,
-      functionName: 'swap',
-      args: [0, minAmountOut, account.address, '0x'], // amount0Out, amount1Out, to, data
+      address: router,
+      abi: UniswapV2RouterABI,
+      functionName: 'swapExactTokensForTokens',
+      args: [
+        amountIn,
+        amountOutMin,
+        path,
+        account.address,
+        deadline
+      ],
     });
-    await publicClient.waitForTransactionReceipt({ hash: swapTx });
-    console.log('Swap completed successfully');
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: swapTx });
+    console.log('Swap executed successfully', { transactionHash: swapTx });
 
     // Check final balances
     const finalBalance1 = await publicClient.readContract({
@@ -113,6 +120,8 @@ async function main() {
       token1: formatEther(finalBalance1),
       token2: formatEther(finalBalance2),
     });
+    console.log('Token1 spent:', formatEther(initialBalance1 - finalBalance1));
+    console.log('Token2 received:', formatEther(finalBalance2 - initialBalance2));
 
     // Check final reserves
     const finalReserves = await publicClient.readContract({
@@ -124,8 +133,6 @@ async function main() {
       reserve0: formatEther(finalReserves[0]),
       reserve1: formatEther(finalReserves[1]),
     });
-
-    console.log('Swap completed successfully!');
 
   } catch (error) {
     console.error('Error during swap:', error);

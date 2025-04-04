@@ -38,6 +38,14 @@ async function main() {
     const pairAddress = await factory.getPair(token1Address, token2Address);
     console.log("Pair created at:", pairAddress);
 
+    // Deploy UniswapV2Router
+    console.log("Deploying UniswapV2Router...");
+    const Router = await hre.ethers.getContractFactory("UniswapV2Router");
+    const router = await Router.deploy(factoryAddress);
+    await router.waitForDeployment();
+    const routerAddress = await router.getAddress();
+    console.log("UniswapV2Router deployed to:", routerAddress);
+
     // Mint initial tokens to the signer
     console.log("Minting initial tokens...");
     const mintAmount = hre.ethers.parseEther("10000");
@@ -53,6 +61,7 @@ async function main() {
     console.log("Token2:", token2Address);
     console.log("Factory:", factoryAddress);
     console.log("Pair:", pairAddress);
+    console.log("Router:", routerAddress);
 
     // Save addresses to a file for later use
     const fs = require('fs');
@@ -60,7 +69,8 @@ async function main() {
       token1: token1Address,
       token2: token2Address,
       factory: factoryAddress,
-      pair: pairAddress
+      pair: pairAddress,
+      router: routerAddress
     };
     fs.writeFileSync('deployed-addresses.json', JSON.stringify(addresses, null, 2));
     console.log("\nAddresses saved to deployed-addresses.json");
@@ -76,4 +86,4 @@ main()
   .catch((error) => {
     console.error(error);
     process.exit(1);
-  }); 
+  });

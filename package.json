@@ -15,7 +15,6 @@
     "@uniswap/v2-sdk": "^4.4.0",
     "antd": "^5.1.5",
     "axios": "^1.2.3",
-    "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.6.2",
@@ -47,5 +46,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-verify": "^1.1.1",
+    "@types/mocha": "^10.0.10",
+    "ethers": "^6.13.5",
+    "ts-node": "^10.9.2"
   }
 }

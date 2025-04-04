@@ -18,15 +18,15 @@ async function main() {
     const Token2 = await hre.ethers.getContractAt("TestToken", token2);
 
     // Amount to mint (in wei)
-    const amount = ethers.utils.parseEther("10000"); // 10,000 tokens each
+    const amount = ethers.parseEther("10000"); // 10,000 tokens each
 
     // Check current balances
     console.log("Current balances:");
     const balance1 = await Token1.balanceOf(signerAddress);
     const balance2 = await Token2.balanceOf(signerAddress);
     console.log({
-      token1: ethers.utils.formatEther(balance1),
-      token2: ethers.utils.formatEther(balance2)
+      token1: ethers.formatEther(balance1),
+      token2: ethers.formatEther(balance2)
     });
 
     // Mint tokens
@@ -44,8 +44,8 @@ async function main() {
     const newBalance1 = await Token1.balanceOf(signerAddress);
     const newBalance2 = await Token2.balanceOf(signerAddress);
     console.log({
-      token1: ethers.utils.formatEther(newBalance1),
-      token2: ethers.utils.formatEther(newBalance2)
+      token1: ethers.formatEther(newBalance1),
+      token2: ethers.formatEther(newBalance2)
     });
 
   } catch (error) {
