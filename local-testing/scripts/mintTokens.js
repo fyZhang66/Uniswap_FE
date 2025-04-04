@@ -2,11 +2,13 @@ const hre = require("hardhat");
 const { ethers } = require("hardhat");
 const fs = require('fs');
 
+const CUSTOM_ADDRESS = "0x91c2F30bc8f156B345B166c9b1F31C4acf7f2163"
 async function main() {
   try {
     // Get the signer
-    const [signer] = await hre.ethers.getSigners();
-    const signerAddress = await signer.getAddress();
+    // const [signer] = await hre.ethers.getSigners();
+    // const signerAddress = await signer.getAddress();
+    const signerAddress = CUSTOM_ADDRESS;
     console.log("Using signer address:", signerAddress);
 
     // Read deployed addresses

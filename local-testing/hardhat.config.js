@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
@@ -22,5 +23,14 @@ module.exports = {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
     },
+    virtual_mainnet: {
+      url: "https://virtual.mainnet.rpc.tenderly.co/4cbb7988-0b91-409b-bbb0-ccee52c414e6",
+      chainId: 1,
+    },
+  },
+  tenderly: {
+    // https://docs.tenderly.co/account/projects/account-project-slug
+    project: "project",
+    username: "Kayce",
   },
 }; 
