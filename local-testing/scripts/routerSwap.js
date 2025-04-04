@@ -33,8 +33,6 @@ async function main() {
 
     // Amount to swap
     const amountIn = parseEther('10'); // 10 tokens
-    const amountOutMin = parseEther('9'); // 9.5 tokens (5% slippage)
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 20); // 20 minutes from now
 
     // Check initial balances
     const initialBalance1 = await publicClient.readContract({
@@ -73,7 +71,14 @@ async function main() {
       functionName: 'getAmountsOut',
       args: [amountIn, path],
     });
-    console.log('Expected output amount:', formatEther(amountsOut[1]));
+    const expectedOutput = amountsOut[1];
+    console.log('Expected output amount:', formatEther(expectedOutput));
+    
+    // Set minimum output with 5% slippage
+    const minAmountOut = (expectedOutput * BigInt(95)) / BigInt(100);
+    console.log('Minimum output amount (5% slippage):', formatEther(minAmountOut));
+    
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 20); // 20 minutes from now
 
     // Approve token1 for router
     console.log('Approving token1 for router...');
@@ -88,13 +93,21 @@ async function main() {
 
     // Execute swap
     console.log('Executing swap...');
+    console.log('Swap parameters:', {
+      amountIn: formatEther(amountIn),
+      minAmountOut: formatEther(minAmountOut),
+      path: path,
+      to: account.address,
+      deadline: Number(deadline)
+    });
+    
     const swapTx = await walletClient.writeContract({
       address: router,
       abi: UniswapV2RouterABI,
       functionName: 'swapExactTokensForTokens',
       args: [
         amountIn,
-        amountOutMin,
+        minAmountOut,
         path,
         account.address,
         deadline
