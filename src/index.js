@@ -16,6 +16,7 @@ import {
 } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { infura_connection, infura_connection_base } from "./resource";
+import { ethers } from "ethers";
 
 const config = getDefaultConfig({
   appName: "My RainbowKit App",
@@ -29,6 +30,8 @@ const config = getDefaultConfig({
 });
 
 const queryClient = new QueryClient();
+
+const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

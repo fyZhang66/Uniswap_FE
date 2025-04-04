@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/"
+      }
+    ],
+    "env": {
+      "REACT_APP_INFURA_KEY": "@react_app_infura_key",
+      "REACT_APP_PROJECT_ID": "@react_app_project_id"
+    }
+  }

@@ -40,5 +40,19 @@
     "name": "GameStop",
     "address": "0xbeb0fd48c2ba0f1aacad2814605f09e08a96b94e",
     "decimals": 9
+  },
+  {
+    "address": "YOUR_LOCAL_TOKEN_1_ADDRESS",
+    "name": "Test Token 1",
+    "symbol": "TT1",
+    "decimals": 18,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
+  },
+  {
+    "address": "YOUR_LOCAL_TOKEN_2_ADDRESS",
+    "name": "Test Token 2",
+    "symbol": "TT2",
+    "decimals": 18,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
   }
 ]

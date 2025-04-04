@@ -1,0 +1,31 @@
+{
+  "name": "local-testing",
+  "version": "1.0.0",
+  "description": "Local testing for Uniswap V2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-wagmi": "node scripts/test-wagmi.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.9",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "@nomiclabs/hardhat-ethers": "^3.0.5",
+    "@nomiclabs/hardhat-etherscan": "^4.0.0",
+    "@typechain/ethers-v6": "^0.4.2",
+    "@typechain/hardhat": "^8.0.3",
+    "chai": "^4.3.10",
+    "ethers": "^6.9.0",
+    "hardhat": "^2.19.4",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.6",
+    "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "viem": "^1.19.4"
+  }
+}
