@@ -1,26 +1,15 @@
-const { createPublicClient, http, parseEther, formatEther } = require('viem');
-const { hardhat } = require('viem/chains');
-const { createWalletClient } = require('viem');
-const { privateKeyToAccount } = require('viem/accounts');
+const { parseEther, formatEther } = require('viem');
 const fs = require('fs');
+const { getAccount, getPublicClient, getWalletClient } = require('./clientConfig');
 
 // Read deployed addresses
 const addresses = JSON.parse(fs.readFileSync('deployed-addresses.json', 'utf8'));
 const { token1, token2, factory, pair, router } = addresses;
 
-// Create clients
-const publicClient = createPublicClient({
-  chain: hardhat,
-  transport: http(),
-});
-
-const account = privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'); // Hardhat default account
-
-const walletClient = createWalletClient({
-  account,
-  chain: hardhat,
-  transport: http(),
-});
+// Get clients from the shared config
+const publicClient = getPublicClient();
+const account = getAccount();
+const walletClient = getWalletClient();
 
 // Contract ABIs
 const TestTokenABI = require('../artifacts/contracts/ERC20.sol/TestToken.json').abi;

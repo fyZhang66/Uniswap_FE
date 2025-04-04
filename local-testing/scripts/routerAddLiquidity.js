@@ -1,8 +1,6 @@
-const { createPublicClient, http, parseEther, formatEther } = require("viem");
-const { hardhat } = require("viem/chains");
-const { createWalletClient } = require("viem");
-const { privateKeyToAccount } = require("viem/accounts");
+const { parseEther, formatEther } = require("viem");
 const fs = require("fs");
+const { getAccount, getPublicClient, getWalletClient } = require("./clientConfig");
 
 // Read deployed addresses
 const addresses = JSON.parse(
@@ -10,56 +8,10 @@ const addresses = JSON.parse(
 );
 const { token1, token2, factory, pair, router } = addresses;
 
-// Create clients for Hardhat
-// const publicClient = createPublicClient({
-//   chain: hardhat,
-//   transport: http(),
-// });
-
-// For tenderly.
-const publicClient = createPublicClient({
-  chain: {
-    id: 1, // Ethereum mainnet ID
-    rpcUrls: {
-      default: {
-        http: [
-          "https://virtual.mainnet.rpc.tenderly.co/4cbb7988-0b91-409b-bbb0-ccee52c414e6",
-        ],
-      },
-    },
-  },
-  transport: http(),
-});
-
-// For Hardhat
-// const account = privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'); // Hardhat default account
-// For Tenderly
-const CUSTOM_ADDRESS = {
-  address: "0x91c2F30bc8f156B345B166c9b1F31C4acf7f2163",
-};
-const account = CUSTOM_ADDRESS;
-
-// For hardhat
-// const walletClient = createWalletClient({
-//   account,
-//   chain: hardhat,
-//   transport: http(),
-// });
-// For Tenderly
-const walletClient = createWalletClient({
-  account,
-  chain: {
-    id: 1,
-    rpcUrls: {
-      default: {
-        http: [
-          "https://virtual.mainnet.rpc.tenderly.co/4cbb7988-0b91-409b-bbb0-ccee52c414e6",
-        ],
-      },
-    },
-  },
-  transport: http(),
-});
+// Get clients from the shared config
+const publicClient = getPublicClient();
+const account = getAccount();
+const walletClient = getWalletClient();
 
 // Contract ABIs
 const TestTokenABI =
